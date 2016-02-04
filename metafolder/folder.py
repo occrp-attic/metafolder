@@ -86,12 +86,12 @@ class MetaItem(object):
         return self._identifier
 
     @property
-    def _data_path(self):
+    def data_path(self):
         return os.path.join(self.folder._data_base, self.hash[:2],
                             self.hash[2:4], self.hash[4:6], self.hash)
 
     @property
-    def _meta_path(self):
+    def meta_path(self):
         fn = '%s.json' % self.hash
         return os.path.join(self.folder._data_base, self.hash[:2],
                             self.hash[2:4], self.hash[4:6], fn)
@@ -100,7 +100,7 @@ class MetaItem(object):
     def meta(self):
         if self._meta is None:
             try:
-                with open(self._meta_path, 'r') as fh:
+                with open(self.meta_path, 'r') as fh:
                     self._meta = json.load(fh)
             except Exception:
                 self._meta = {'$identifier': self._identifier}
@@ -112,27 +112,27 @@ class MetaItem(object):
             value['$identifier'] = self._identifier
         self._meta = value
         try:
-            os.makedirs(os.path.dirname(self._meta_path))
+            os.makedirs(os.path.dirname(self.meta_path))
         except:
             pass
-        with open(self._meta_path, 'w') as fh:
+        with open(self.meta_path, 'w') as fh:
             json.dump(self._meta, fh)
 
     def _ensure_data_path(self):
         try:
-            os.makedirs(os.path.dirname(self._data_path))
+            os.makedirs(os.path.dirname(self.data_path))
         except:
             pass
 
     def store_file(self, source_path):
         self._ensure_data_path()
-        with open(self._data_path, 'w') as fout:
+        with open(self.data_path, 'w') as fout:
             with open(source_path, 'r') as fin:
                 shutil.copyfileobj(fin, fout)
 
     def store_data(self, data):
         self._ensure_data_path()
-        with open(self._data_path, 'w') as fout:
+        with open(self.data_path, 'w') as fout:
             fout.write(data)
 
     @property
@@ -144,9 +144,9 @@ class MetaItem(object):
             fh.close()
 
     def open(self):
-        if not os.path.isfile(self._data_path):
+        if not os.path.isfile(self.data_path):
             return None
-        return open(self._data_path, 'r')
+        return open(self.data_path, 'r')
 
     def __unicode__(self):
         return self.identifier
