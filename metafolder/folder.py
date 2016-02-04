@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 import hashlib
 
 META_PREFIX = os.path.join('meta', '')
@@ -26,6 +27,13 @@ class MetaFolder(object):
             meta['source_path'] = source_path
         item = MetaItem(self, identifier=identifier)
         item.meta = meta
+        item.store_file(source_path)
+        return item
+
+    def add_data(self, data, identifier, meta=None):
+        item = MetaItem(self, identifier=identifier)
+        item.meta = meta or {}
+        item.store_data(data)
         return item
 
     @property
@@ -94,7 +102,7 @@ class MetaItem(object):
             try:
                 with open(self._meta_path, 'r') as fh:
                     self._meta = json.load(fh)
-            except KeyError:
+            except Exception:
                 self._meta = {'$identifier': self._identifier}
         return self._meta
 
@@ -109,6 +117,36 @@ class MetaItem(object):
             pass
         with open(self._meta_path, 'w') as fh:
             json.dump(self._meta, fh)
+
+    def _ensure_data_path(self):
+        try:
+            os.makedirs(os.path.dirname(self._data_path))
+        except:
+            pass
+
+    def store_file(self, source_path):
+        self._ensure_data_path()
+        with open(self._data_path, 'w') as fout:
+            with open(source_path, 'r') as fin:
+                shutil.copyfileobj(fin, fout)
+
+    def store_data(self, data):
+        self._ensure_data_path()
+        with open(self._data_path, 'w') as fout:
+            fout.write(data)
+
+    @property
+    def data(self):
+        fh = self.open()
+        try:
+            return fh.read()
+        finally:
+            fh.close()
+
+    def open(self):
+        if not os.path.isfile(self._data_path):
+            return None
+        return open(self._data_path, 'r')
 
     def __unicode__(self):
         return self.identifier
