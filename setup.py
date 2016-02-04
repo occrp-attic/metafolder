@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='metafolder',
-    version='0.1',
+    version='0.1.1',
     description="Store a bunch of documents alongside basic metadata",
     long_description="",
     classifiers=[

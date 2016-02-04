@@ -93,7 +93,7 @@ class MetaItem(object):
     @property
     def meta_path(self):
         fn = '%s.json' % self.hash
-        return os.path.join(self.folder._data_base, self.hash[:2],
+        return os.path.join(self.folder._meta_base, self.hash[:2],
                             self.hash[2:4], self.hash[4:6], fn)
 
     @property
