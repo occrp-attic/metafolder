@@ -118,6 +118,11 @@ class MetaItem(object):
         with open(self.meta_path, 'w') as fh:
             json.dump(self._meta, fh)
 
+    @property
+    def exists(self):
+        return os.path.isfile(self.meta_path) \
+            and os.path.isfile(self.data_path)
+
     def _ensure_data_path(self):
         try:
             os.makedirs(os.path.dirname(self.data_path))
