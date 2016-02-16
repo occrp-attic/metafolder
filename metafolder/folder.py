@@ -1,4 +1,5 @@
 import os
+import six
 import json
 import shutil
 import hashlib
@@ -137,6 +138,11 @@ class MetaItem(object):
 
     def store_data(self, data):
         self._ensure_data_path()
+        if isinstance(data, six.text_type):
+            meta = self.meta
+            meta['encoding'] = 'utf-8'
+            self.meta = meta
+            data = data.encode('utf-8')
         with open(self.data_path, 'w') as fout:
             fout.write(data)
 
@@ -144,7 +150,10 @@ class MetaItem(object):
     def data(self):
         fh = self.open()
         try:
-            return fh.read()
+            data = fh.read()
+            if 'encoding' in self.meta:
+                data = data.decode(self.meta['encoding'])
+            return data
         finally:
             fh.close()
 
@@ -161,4 +170,8 @@ class MetaItem(object):
 
     @classmethod
     def get_hash(cls, identifier):
+        if not isinstance(identifier, six.string_types):
+            identifier = six.text_type(identifier)
+        if isinstance(identifier, six.text_type):
+            identifier = identifier.encode('utf-8')
         return hashlib.sha256(identifier).hexdigest()

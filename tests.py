@@ -1,3 +1,4 @@
+# coding: utf-8
 import os
 import shutil
 import unittest
@@ -36,6 +37,12 @@ class TestMetaFolder(unittest.TestCase):
     def test_in_out(self):
         ident = 'banana foo'
         self.mf.add_file(__file__, identifier=ident, meta={'foo': 'bar'})
+        item = self.mf.get(ident)
+        assert ident in item.data, item.data
+
+    def test_unicode_identifier(self):
+        ident = u'banääna foööö'
+        self.mf.add_data(ident, identifier=ident, meta={'foo': 'bar'})
         item = self.mf.get(ident)
         assert ident in item.data, item.data
 
